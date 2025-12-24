@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Romaji → Hiragana Quiz (Long Vowels)</title>
+
+<style>
+
+  body {
+
+    font-family: "Hiragino Kaku Gothic Pro", "Meiryo", sans-serif;
+
+    background:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:40px;
+
+    text-align:center;
+
+    color:#333;
+
+  }
+
+  h1 { color:#b23b3b; margin-bottom:10px; }
+
+  #counter { margin-bottom:20px; font-size:1.1em; }
+
+  #game-box {
+
+    background:#fff;
+
+    border-radius:15px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+
+    padding:30px;
+
+    width:90%;
+
+    max-width:500px;
+
+  }
+
+  #romaji { font-size:2.4em; margin:20px 0; letter-spacing:1px; }
+
+  .option {
+
+    display:block;
+
+    background:#ffeaea;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    font-size:1.3em;
+
+    width:100%;
+
+    max-width:260px;
+
+    margin:10px auto;
+
+    cursor:pointer;
+
+  }
+
+  .option:hover { background:#f7b6b6; }
+
+  #message { margin-top:20px; font-weight:bold; font-size:1.2em; }
+
+  #next {
+
+    display:none;
+
+    margin-top:20px;
+
+    background:#b23b3b;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 20px;
+
+    font-size:1.1em;
+
+    cursor:pointer;
+
+  }
+
+  #gif-box { margin-top:20px; }
+
+  #gif-box img { max-width:220px; border-radius:12px; }
+
+</style>
+
+</head>
+
+<body>
+
+<h1> Pronunciation → Hiragana</h1>
+
+<div id="counter"></div>
+
+<div id="game-box">
+
+  <div id="romaji"></div>
+
+  <div id="options"></div>
+
+  <div id="message"></div>
+
+  <div id="gif-box"></div>
+
+  <button id="next" onclick="nextQuestion()">Next</button>
+
+</div>
+
+<script>
+
+const questions = [
+
+  { romaji:"hīki", kana:"ひいき", distractors:["ひき","ひっき","ひきい"] },
+
+  { romaji:"chīsai", kana:"ちいさい", distractors:["ちかい","ちさい","ちいかい"] },
+
+  { romaji:"yasashī", kana:"やさしい", distractors:["やさし","やさしいい","やさしー"] },
+
+  { romaji:"yasui", kana:"やすい", distractors:["やすうい","やっすい","やす"] },
+
+  { romaji:"nioi", kana:"におい", distractors:["にお","におおい","におっい"] },
+
+  { romaji:"okāsan", kana:"おかあさん", distractors:["おかさん","おかあさ","おかあさー"] },
+
+  { romaji:"okusan", kana:"おくさん", distractors:["おくさ","おくさー","おくさあ"] },
+  
+  { romaji:"kasan", kana:"かさん", distractors:["かあさん","かさあん","かざん"] },
+
+  { romaji:"obasan", kana:"おばさん", distractors:["おばさ","おばさー","おばあさ"] },
+
+  { romaji:"obāsan", kana:"おばあさん", distractors:["おばさん","おばあさ","おばあさー"] },
+
+  { romaji:"yasai", kana:"やさい", distractors:["やさあい","やっさい","やさ"] },
+
+  { romaji:"chīki", kana:"ちいき", distractors:["ちき","ちっき","ちきい"] },
+
+  { romaji:"chikai", kana:"ちかい", distractors:["ちかあい","ちかっい","ちか"] },
+
+  { romaji:"chisai", kana:"ちさい", distractors:["ちさあい","ちっさい","ちさ"] },
+
+  { romaji:"chī", kana:"ちい", distractors:["ち","ちっ","ちいい"] },
+
+  { romaji:"chishiki", kana:"ちしき", distractors:["ちしいき","ちしっき","ちしきい"] },
+
+  { romaji:"hikitsuzuku", kana:"ひきつづく", distractors:["ひきつく","ひいきつつく","ひきいつづく"] },
+
+  { romaji:"bīshiki", kana:"びいしき", distractors:["びしき","びっしき","びしきい"] },
+
+  { romaji:"onīsan", kana:"おにいさん", distractors:["おにさん","おにいさ","おにいさー"] },
+
+  { romaji:"onisan", kana:"おにさん", distractors:["おにさ","おにっさ","おにさー"] },
+
+  { romaji:"kite kudasai", kana:"きてください", distractors:["きてくださ","きてくださーい","きてくださあい"] },
+
+  { romaji:"kīte kudasai", kana:"きいてください", distractors:["きいてくださ","きいてくださーい","きいてくださあい"] },
+
+  { romaji:"mīdasu", kana:"みいだす", distractors:["みだす","みっだす","みだあす"] },
+
+  { romaji:"midasu", kana:"みだす", distractors:["みいだす","みだっす","みだあす"] },
+
+  { romaji:"mitasu", kana:"みたす", distractors:["みたっす","みたあす","みいたす"] },
+
+  { romaji:"ojīsan", kana:"おじいさん", distractors:["おじさん","おじいさ","おじいさー"] },
+
+  { romaji:"ojisan", kana:"おじさん", distractors:["おじいさん","おじっさん","おじさー"] },
+
+  { romaji:"akka", kana:"あっか", distractors:["ああか","あかあ","あっかあ"] },
+  
+  { romaji:"yūmei", kana:"ゆうめい", distractors:["ゆめい","やうめい","やおめい"] },
+
+  { romaji:"kūki", kana:"くうき", distractors:["くき","くっき","くきい"] },
+  
+  { romaji:"sēkaku", kana:"せいかく", distractors:["せかく","せっかく","けいかく"] },
+
+  { romaji:"yūmē", kana:"ゆうめい", distractors:["ゆめい","ゆっめい","ゆめえ"] },
+
+  { romaji:"chūi", kana:"ちゅうい", distractors:["ちゅい","ちゅっい","ちゅいい"] },
+
+  { romaji:"kyūkē", kana:"きゅうけい", distractors:["きゅけい","きゅっけい","きゅけえ"] },
+
+  { romaji:"shīn", kana:"しいん", distractors:["しん","しっん","しんい"] },
+
+  { romaji:"īe", kana:"いいえ", distractors:["いえ","いっえ","いええ"] },
+
+{ romaji:"kiyō", kana:"きよう", distractors:["きよ","きいよ","きよお"] },
+  
+  { romaji:"suiē", kana:"すいえい", distractors:["すいえ","すえい","すいっえ"] },
+  
+  { romaji:"jiyū", kana:"じゆう", distractors:["じゆ","じゆお","しゆ"] },
+
+  { romaji:"sēto", kana:"せいと", distractors:["せと","せえと","せっと"] },
+
+{ romaji:"yōka", kana:"ようか", distractors:["よか","よっか","よかあ"] },  
+  
+{ romaji:"kyōkai", kana:"きょうかい", distractors:["きょかい","きゅうかい","きょうがい"] }, 
+  
+{ romaji:"henkō", kana:"へんこう", distractors:["へんこ","へんっこ","べんこお"] },
+  
+  { romaji:"yokka", kana:"よっか", distractors:["よか","ようか","ようっか"] },
+  
+  { romaji:"kēkaku", kana:"けいかく", distractors:["けかく","けえかく","けっかく"] },
+
+  { romaji:"tēnē", kana:"ていねい", distractors:["てねい","てえねい","ていねえ"] },
+
+  { romaji:"hōhō", kana:"ほうほう", distractors:["ほほう","ほっほう","ほうほ"] },
+  
+   { romaji:"kūkō", kana:"くうこう", distractors:["くうこ","くこ","くこう"] },
+
+  { romaji:"hōkoku", kana:"ほうこく", distractors:["ほこく","ほっこく","ほうこ"] },
+
+  { romaji:"iji", kana:"いじ", distractors:["いっじ","じい","いじい"] }
+
+];
+
+let currentIndex = 0;
+
+let score = 0;
+
+const romajiEl = document.getElementById("romaji");
+
+const optionsEl = document.getElementById("options");
+
+const messageEl = document.getElementById("message");
+
+const nextBtn = document.getElementById("next");
+
+const counterEl = document.getElementById("counter");
+
+const gifBox = document.getElementById("gif-box");
+
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function showQuestion(){
+
+  const q = questions[currentIndex];
+
+  counterEl.textContent = `Question ${currentIndex+1} / ${questions.length}`;
+
+  romajiEl.textContent = q.romaji;
+
+  messageEl.textContent = "";
+
+  nextBtn.style.display = "none";
+
+  gifBox.innerHTML = "";
+
+  const opts = shuffle([q.kana, ...q.distractors]);
+
+  optionsEl.innerHTML = "";
+
+  opts.forEach(opt=>{
+
+    const b = document.createElement("button");
+
+    b.className="option";
+
+    b.textContent=opt;
+
+    b.onclick=()=>checkAnswer(opt);
+
+    optionsEl.appendChild(b);
+
+  });
+
+}
+
+function checkAnswer(choice){
+
+  const correct = questions[currentIndex].kana;
+
+  if(choice===correct){
+
+    messageEl.textContent="✅ Correct!";
+
+    messageEl.style.color="#2e7d32";
+
+    score++;
+
+  } else {
+
+    messageEl.textContent=`❌ Correct answer: ${correct}`;
+
+    messageEl.style.color="#b23b3b";
+
+  }
+
+  nextBtn.style.display="inline-block";
+
+  document.querySelectorAll(".option").forEach(b=>b.disabled=true);
+
+}
+
+function nextQuestion(){
+
+  currentIndex++;
+
+  currentIndex<questions.length ? showQuestion() : finishGame();
+
+}
+
+function finishGame(){
+
+  romajiEl.textContent="🎉 Finished!";
+
+  counterEl.textContent="";
+
+  optionsEl.innerHTML="";
+
+  let gif = score>22
+
+    ? "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cool%20cute%20cat.gif"
+
+    : score>12
+
+    ? "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cute%20cat%20walking.gif"
+
+    : "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/sad%20cute%20cat.gif";
+
+  messageEl.innerHTML=`Score: ${score} / ${questions.length}`;
+
+  gifBox.innerHTML=`<img src="${gif}" alt="cat gif">`;
+
+}
+
+showQuestion();
+
+</script>
+
+</body>
+
+</html>
+
