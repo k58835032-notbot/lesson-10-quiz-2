@@ -1,142 +1,90 @@
 <!DOCTYPE html>
-
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8" />
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>Romaji → Hiragana Quiz (Long Vowels)</title>
 
 <style>
-
   body {
-
     font-family: "Hiragino Kaku Gothic Pro", "Meiryo", sans-serif;
-
     background:#fff;
-
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     padding:40px;
-
     text-align:center;
-
     color:#333;
-
   }
-
   h1 { color:#b23b3b; margin-bottom:10px; }
-
   #counter { margin-bottom:20px; font-size:1.1em; }
 
   #game-box {
-
     background:#fff;
-
     border-radius:15px;
-
     box-shadow:0 4px 12px rgba(0,0,0,.15);
-
     padding:30px;
-
     width:90%;
-
     max-width:500px;
-
   }
 
   #romaji { font-size:2.4em; margin:20px 0; letter-spacing:1px; }
 
   .option {
-
     display:block;
-
     background:#ffeaea;
-
     border:none;
-
     border-radius:10px;
-
     padding:12px;
-
     font-size:1.3em;
-
     width:100%;
-
     max-width:260px;
-
     margin:10px auto;
-
     cursor:pointer;
-
   }
 
   .option:hover { background:#f7b6b6; }
 
   #message { margin-top:20px; font-weight:bold; font-size:1.2em; }
 
+
+
   #next {
-
     display:none;
-
     margin-top:20px;
-
     background:#b23b3b;
-
     color:white;
-
     border:none;
-
     border-radius:10px;
-
     padding:10px 20px;
-
     font-size:1.1em;
-
     cursor:pointer;
-
   }
 
   #gif-box { margin-top:20px; }
-
   #gif-box img { max-width:220px; border-radius:12px; }
-
 </style>
-
 </head>
 
 <body>
 
-<h1> Pronunciation → Hiragana</h1>
-
+<h1>Pronunciation → Hiragana</h1>
 <div id="counter"></div>
 
 <div id="game-box">
-
   <div id="romaji"></div>
-
   <div id="options"></div>
-
   <div id="message"></div>
-
+  <div id="motivation"></div>
   <div id="gif-box"></div>
-
   <button id="next" onclick="nextQuestion()">Next</button>
-
 </div>
 
+
 <script>
-
-const questions = [
-
-  { romaji:"hīki", kana:"ひいき", distractors:["ひき","ひっき","ひきい"] },
+/* ========= QUESTION POOL (50) ========= */
+const ALL_QUESTIONS = [
+   { romaji:"hīki", kana:"ひいき", distractors:["ひき","ひっき","ひきい"] },
 
   { romaji:"chīsai", kana:"ちいさい", distractors:["ちかい","ちさい","ちいかい"] },
 
@@ -238,121 +186,97 @@ const questions = [
 
 ];
 
-let currentIndex = 0;
+/* ========= GAME SETUP ========= */
+const TOTAL_PER_GAME = 25;
 
+function shuffle(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+// pick random 25 questions
+const questions = shuffle([...ALL_QUESTIONS]).slice(0, TOTAL_PER_GAME);
+
+let currentIndex = 0;
 let score = 0;
 
+/* ========= DOM ========= */
 const romajiEl = document.getElementById("romaji");
-
 const optionsEl = document.getElementById("options");
-
 const messageEl = document.getElementById("message");
-
+const motivationEl = document.getElementById("motivation");
 const nextBtn = document.getElementById("next");
-
 const counterEl = document.getElementById("counter");
-
 const gifBox = document.getElementById("gif-box");
 
-function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
-
-function showQuestion(){
-
+/* ========= GAME LOGIC ========= */
+function showQuestion() {
   const q = questions[currentIndex];
 
-  counterEl.textContent = `Question ${currentIndex+1} / ${questions.length}`;
-
+  counterEl.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
   romajiEl.textContent = q.romaji;
-
   messageEl.textContent = "";
-
   nextBtn.style.display = "none";
-
   gifBox.innerHTML = "";
 
-  const opts = shuffle([q.kana, ...q.distractors]);
-
+  const options = shuffle([q.kana, ...q.distractors]);
   optionsEl.innerHTML = "";
 
-  opts.forEach(opt=>{
-
-    const b = document.createElement("button");
-
-    b.className="option";
-
-    b.textContent=opt;
-
-    b.onclick=()=>checkAnswer(opt);
-
-    optionsEl.appendChild(b);
-
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt);
+    optionsEl.appendChild(btn);
   });
-
 }
 
-function checkAnswer(choice){
-
+function checkAnswer(choice) {
   const correct = questions[currentIndex].kana;
 
-  if(choice===correct){
-
-    messageEl.textContent="✅ Correct!";
-
-    messageEl.style.color="#2e7d32";
-
+  if (choice === correct) {
+    messageEl.textContent = "✅ Correct!";
+    messageEl.style.color = "#2e7d32";
     score++;
-
   } else {
-
-    messageEl.textContent=`❌ Correct answer: ${correct}`;
-
-    messageEl.style.color="#b23b3b";
-
+    messageEl.textContent = `❌ Correct answer: ${correct}`;
+    messageEl.style.color = "#b23b3b";
   }
 
-  nextBtn.style.display="inline-block";
-
-  document.querySelectorAll(".option").forEach(b=>b.disabled=true);
-
+  nextBtn.style.display = "inline-block";
+  document.querySelectorAll(".option").forEach(b => b.disabled = true);
 }
 
-function nextQuestion(){
-
+function nextQuestion() {
   currentIndex++;
-
-  currentIndex<questions.length ? showQuestion() : finishGame();
-
+  currentIndex < questions.length ? showQuestion() : finishGame();
 }
 
-function finishGame(){
+function finishGame() {
+  romajiEl.textContent = "🎉 Finished!";
+  counterEl.textContent = "";
+  optionsEl.innerHTML = "";
 
-  romajiEl.textContent="🎉 Finished!";
+ let motivationText = "";
+  let gif = "";
 
-  counterEl.textContent="";
+  if (score >= 21) {
+    motivationText = "🌟 Well done! You are spelling & pronunciation master!";
+    gif = "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cool%20cute%20cat.gif";
+  } else if (score >= 12) {
+    motivationText = "👍 You're getting there! Keep practicing!";
+    gif = "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cute%20cat%20walking.gif";
+  } else {
+    motivationText = "🌱 Keep practicing — every try matters!";
+    gif = "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/sad%20cute%20cat.gif";
+  }
 
-  optionsEl.innerHTML="";
-
-  let gif = score>22
-
-    ? "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cool%20cute%20cat.gif"
-
-    : score>12
-
-    ? "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/cute%20cat%20walking.gif"
-
-    : "https://raw.githubusercontent.com/k58835032-notbot/lesson-9-morae/main/sad%20cute%20cat.gif";
-
-  messageEl.innerHTML=`Score: ${score} / ${questions.length}`;
-
-  gifBox.innerHTML=`<img src="${gif}" alt="cat gif">`;
-
+  messageEl.innerHTML = `Score: ${score} / ${questions.length}`;
+  motivationEl.textContent = motivationText;
+  gifBox.innerHTML = `<img src="${gif}" alt="cat gif">`;
 }
 
 showQuestion();
-
 </script>
 
 </body>
-
 </html>
-
